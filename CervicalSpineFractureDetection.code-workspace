@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+    ],
+    "settings": {
+    "psi-header.variables": [
+
+        ["projectCreationYear", "2022"],
+        ["url", "https://github.com/john-james-ai/CervicalSpineFractureDetection"],
+        ["projectname", "Cervical Spine FractureDetection"],
+        ["version", "0.1.0"],
+        ["pythonversion","3.8.13"]
+    ],
+    }
+}
