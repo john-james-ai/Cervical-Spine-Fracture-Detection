@@ -26,7 +26,7 @@ classifiers = [
 ]
 
 packages = [
-    { include = "CervicalSpineFractureDetection", from = "src" }
+    { include = "csf" }
 ]
 
 [tool.poetry.dependencies]
@@ -62,7 +62,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
-src_paths = ["src", "tests"]
+src_paths = ["csf", "tests"]
 
 [tool.black]
 target-version = ["py37", "py38", "py39"]
@@ -70,11 +70,11 @@ include = '\.pyi?$'
 
 [tool.pytest.ini_options]
 addopts = """\
-    --cov CervicalSpineFractureDetection \
-    --cov tests \
+    --cov csf \
     --cov-report term-missing \
     --no-cov-on-fail \
 """
+testpaths = ["tests"]
 
 [tool.coverage.report]
 fail_under = 100

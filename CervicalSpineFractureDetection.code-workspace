@@ -5,13 +5,14 @@
 		}
     ],
     "settings": {
-    "psi-header.variables": [
+
+        "psi-header.variables": [
 
         ["projectCreationYear", "2022"],
-        ["url", "https://github.com/john-james-ai/CervicalSpineFractureDetection"],
-        ["projectname", "Cervical Spine FractureDetection"],
+        ["url", "https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection"],
+        ["projectname", "Cervical Spine Fracture Detection"],
         ["version", "0.1.0"],
-        ["pythonversion","3.8.13"]
-    ],
+        ["pythonversion","3.10.4"]
+        ]
     }
 }
