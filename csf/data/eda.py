@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday September 13th 2022 06:23:18 pm                                             #
-# Modified   : Wednesday September 14th 2022 09:48:28 pm                                           #
+# Modified   : Wednesday September 14th 2022 09:57:35 pm                                           #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -256,8 +256,13 @@ class CervicalSpineFractures:
             center=0,
             square=True,
             linewidths=0.5,
+            annot=True,
+            fmt=".1%",
+            ax=ax,
             cbar_kws={"shrink": 0.5},
         )
+
+        ax.set_title("Fracture Site Correlation Plot")
 
     def _annotate_bars(self, ax: plt.Axes, total: int, nudge: float) -> plt.Axes:
         """Adds count and percent annotations to bar charts
