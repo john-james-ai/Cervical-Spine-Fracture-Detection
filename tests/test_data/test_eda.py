@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday September 13th 2022 08:32:23 pm                                             #
-# Modified   : Wednesday September 14th 2022 11:42:04 am                                           #
+# Modified   : Wednesday September 14th 2022 06:51:53 pm                                           #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -128,5 +128,13 @@ class TestEDA:
 
         print(csf_test.sample())
         assert isinstance(csf_test.sample(), pd.core.frame.DataFrame)
+
+        logger.info("\tCompleted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
+
+    def test_plots(self, caplog, csf_test):
+        logger.info("\tStarted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
+
+        csf_test.patient_diagnoses_plot()
+        assert True
 
         logger.info("\tCompleted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
