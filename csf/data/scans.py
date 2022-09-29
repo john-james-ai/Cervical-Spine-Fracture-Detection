@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Thursday September 15th 2022 03:50:46 am                                            #
-# Modified   : Saturday September 17th 2022 04:06:52 am                                            #
+# Modified   : Thursday September 29th 2022 01:12:46 pm                                            #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -25,7 +25,7 @@ import logging.config
 from pydicom import dcmread
 
 from . import train_images, Study
-from .slices import print_slice
+from .slices import CSFSlice
 
 # ------------------------------------------------------------------------------------------------ #
 logging.basicConfig(level=logging.INFO)
@@ -89,35 +89,48 @@ class CSFScan:
     def content_date(self) -> str:
         return self._content_date
 
-    def plot_slices(self) -> None:
-        """Plots slices"""
-        # pixel aspects, assuming all self._slices are the same
+    def plot_3d_slices(self) -> np.array:
+        # TODO: Won't work with slice objects.
+        # pixel aspects, assuming all slices are the same
         ps = self._slices[0].PixelSpacing
         ss = self._slices[0].SliceThickness
         ax_aspect = ps[1] / ps[0]
         sag_aspect = ps[1] / ss
         cor_aspect = ss / ps[0]
 
-        # plot 3 orthogonal self._slices
-        a1 = plt.subplot(2, 2, 1)
-        plt.imshow(self._img3d[:, :, self._img_shape[2] // 2])
+        # create 3D array
+        img_shape = list(self._slices[0].pixel_array.shape)
+        img_shape.append(len(self._slices))
+        img3d = np.zeros(img_shape)
+
+        # fill 3D array with the images from the files
+        for i, s in enumerate(self._slices):
+            img2d = s.pixel_array
+            img3d[:, :, i] = img2d
+
+        # plot 3 orthogonal slices
+        a1 = plt.subplot(1, 3, 1)
+        plt.imshow(img3d[:, :, img_shape[2] // 2])
         a1.set_aspect(ax_aspect)
 
-        a2 = plt.subplot(2, 2, 2)
-        plt.imshow(self._img3d[:, self._img_shape[1] // 2, :])
+        a2 = plt.subplot(1, 3, 2)
+        plt.imshow(img3d[:, img_shape[1] // 2, :])
         a2.set_aspect(sag_aspect)
 
-        a3 = plt.subplot(2, 2, 3)
-        plt.imshow(self._img3d[self._img_shape[0] // 2, :, :].T)
+        a3 = plt.subplot(1, 3, 3)
+        plt.imshow(img3d[img_shape[0] // 2, :, :].T)
         a3.set_aspect(cor_aspect)
 
         plt.show()
 
-    def print_slice(self, slice_number: int = None) -> None:
-        """Prints slice metadata for requested slice (or random slice if slice_number is none)"""
+    def get_slice(self, slice_number: int = None) -> CSFSlice:
+        """Returns a designated or random slice object
+
+        Args:
+            slice_number (int): Zero indexed slice number
+        """
         slice_number = slice_number or self._get_random_slice_number()
-        dataset = self._slices[slice_number]
-        print_slice(dataset)
+        return self._slices[slice_number]
 
     def view_slice(self) -> None:
         fig, ax = plt.subplots()
@@ -148,42 +161,23 @@ class CSFScan:
         ax.images[0].set_array(volume[ax.index])
 
     def _load_slices(self) -> None:
-        """Loads DICOM files from a given directory"""
-        self._slices = self._extract_slices()
-        self._img3d = self._build_3d_image_array()
-        # self._set_scan_metadata()  # Takes metadata from 1st slice as scan metadata
-
-    def _extract_slices(self) -> list:
         """Sorts and returns the slices having a SliceLocation"""
         logger.info("Loading slices for {}".format(self._study.id))
-        slices = []
+        self._slices = []
         for fname in os.listdir(self._directory):
             fpath = os.path.join(self._directory, fname)
             ds = dcmread(fpath)
-            slices.append(ds)
+            slice = CSFSlice(dataset=ds)
+            self._slices.append(slice)
 
-        logger.info("{} Slices Loaded".format(len(slices)))
+        self._set_scan_metadata()
 
-        return slices  # Remove once SliceLocation attribute sorted.
-
-    def _build_3d_image_array(self) -> np.array:
-        """Builds a 3d image array from the 2d images."""
-        # create 3D array
-        self._img_shape = list(self._slices[0].pixel_array.shape)
-        self._img_shape.append(len(self._slices))
-        img3d = np.zeros(self._img_shape)
-
-        # fill 3D array with the images from the files
-        for i, s in enumerate(self._slices):
-            img2d = s.pixel_array
-            img3d[:, :, i] = img2d
-
-        return img3d
+        logger.info("{} Slices Loaded".format(len(self._slices)))
 
     def _set_scan_metadata(self) -> None:
         """Extracts metadata from the first slice for the scan properties."""
-        self._patient_id = self._slices[0]["Patient ID"]
-        self._content_date = self._slices[0]["Content Date"]
+        self._patient_id = self._slices[0].patient_id
+        self._content_date = self._slices[0].content_date
 
     def _get_random_slice_number(self) -> int:
         rng = default_rng()
