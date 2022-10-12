@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday September 13th 2022 06:23:18 pm                                             #
-# Modified   : Saturday September 17th 2022 12:44:13 am                                            #
+# Modified   : Tuesday October 4th 2022 11:26:04 am                                                #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -53,9 +53,10 @@ class CSFStudies:
     __subaxial_region = ["C3", "C4", "C5", "C6", "C7"]
     __vertebrae = ["C1", "C2", "C3", "C4", "C5", "C6", "C7"]
 
-    def __init__(self, filepath: str) -> None:
+    def __init__(self, filepath: str, patient_ids: list = None) -> None:
         self._filepath = filepath
-        self._df = self._get_data(filepath)
+        self._patient_ids = patient_ids
+        self._df = self._get_data(filepath, patient_ids)
         self._summary = self._summarize()
 
     @property
@@ -146,6 +147,9 @@ class CSFStudies:
     def fractures_by_region(self) -> pd.DataFrame:
         return self._summary["fractures_by_region"]
 
+    def get_studies(self, patients: list = None) -> pd.DataFrame:
+        return self._df[self._df["StudyInstanceUID"].isin(patients)]
+
     def sample(self, n: int = 5) -> pd.DataFrame:
         rng = default_rng()
         indices = rng.integers(low=0, high=self._df.shape[0], size=n)
@@ -193,14 +197,16 @@ class CSFStudies:
 
         plt.show()
 
-    def fractures_plot(self, figsize: tuple = FIGSIZE) -> None:
+    def fractures_plot(
+        self, figsize: tuple = FIGSIZE, title: str = "Fracture Distribution"
+    ) -> None:
         """Barplot showing number of fractures (non_fractures) by vertebrae
 
         Args:
             figsize (tuple): Height and width of plot
         """
         fig = plt.figure(figsize=figsize)
-        fig.suptitle("Fracture Distribution")
+        fig.suptitle(title)
         gs = GridSpec(1, 2, width_ratios=[1, 2])
         ax0 = fig.add_subplot(gs[0])
         ax1 = fig.add_subplot(gs[1])
@@ -226,38 +232,6 @@ class CSFStudies:
         ax1.set_title("Fractures by Vertebrae")
         ax1.set_xlabel("Vertebrae")
         self._annotate_bars(ax=ax1, total=self._df["total"].sum(), nudge=0.15)
-
-    def patient_fractures_plot(self, figsize: tuple = FIGSIZE) -> None:
-        """Barplot showing number of Patients  (non_fractures) by vertebrae
-
-        Args:
-            figsize (tuple): Height and width of plot
-        """
-        fig = plt.figure(figsize=figsize)
-        fig.suptitle("Patient Fracture Distribution")
-        gs = GridSpec(1, 2, width_ratios=[1, 2])
-        ax0 = fig.add_subplot(gs[0])
-        ax1 = fig.add_subplot(gs[1])
-        sns.barplot(
-            x=self._summary["fractures_by_region"].index,
-            y=self._summary["fractures_by_region"]["Number of Fractures"],
-            ax=ax0,
-            palette="Blues",
-        )
-        sns.barplot(
-            x=self._summary["fractures_by_vertebrae"].index,
-            y=self._summary["fractures_by_vertebrae"]["Number of Fractures"],
-            ax=ax1,
-            palette="Blues",
-        )
-        ax0.set_title("Fractures by Region")
-        ax0.set_xlabel("Region")
-        ax0.set_xticks([0, 1], ["Craniovertebral", "Subaxial"])
-        self._annotate_bars(ax=ax0, total=self._df.shape[0], nudge=0.15)
-
-        ax1.set_title("Fractures by Vertebrae")
-        ax1.set_xlabel("Vertebrae")
-        self._annotate_bars(ax=ax1, total=self._df.shape[0], nudge=0.15)
 
     def patient_fracture_count_plot(self, figsize: tuple = FIGSIZE) -> None:
         """Distribution of fracture counts among patients.
@@ -326,7 +300,7 @@ class CSFStudies:
             y = p.get_y() + p.get_height()
             ax.annotate(text, (x, y))
 
-    def _get_data(self, filepath: str) -> pd.DataFrame:
+    def _get_data(self, filepath: str, patient_ids: list = None) -> pd.DataFrame:
         """Reads data from filepath.
 
         Args:
@@ -335,6 +309,8 @@ class CSFStudies:
             DataFrame of original data.
         """
         df = pd.read_csv(filepath, index_col=False)
+        if patient_ids:
+            df = df[df["StudyInstanceUID"].isin(patient_ids)]
         df["craniovertebral"] = df[CSFStudies.__craniovertebral_region].any(axis=1)
         df["n_craniovertebral"] = df[CSFStudies.__craniovertebral_region].sum(axis=1)
         df["subaxial"] = df[CSFStudies.__subaxial_region].any(axis=1)

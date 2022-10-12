@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Saturday October 1st 2022 10:32:32 am                                               #
-# Modified   : Saturday October 1st 2022 03:39:54 pm                                               #
+# Modified   : Wednesday October 12th 2022 07:57:59 am                                             #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -21,7 +21,8 @@ import logging.config
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import ndimage
-from skimage import morphology
+from sklearn.cluster import KMeans
+from skimage import measure, morphology
 
 # ------------------------------------------------------------------------------------------------ #
 from atelier.workflow.operators import Operator
@@ -104,6 +105,21 @@ class Windower(Operator):
         window_image = data.copy()
         window_image[window_image < img_min] = img_min
         window_image[window_image > img_max] = img_max
+
+        if self._display:
+            plt.figure(figsize=(IMG_WIDTH, IMG_HEIGHT))
+            plt.style.use("grayscale")
+
+            plt.subplot(151)
+            plt.imshow(data)
+            plt.title("Hounsfield")
+            plt.axis("off")
+
+            plt.subplot(152)
+            plt.imshow(window_image)
+            plt.title("Spine")
+            plt.axis("off")
+
         return window_image
 
 
@@ -154,7 +170,7 @@ class Denoiser(Operator):
         mask = labels == label_count.argmax()
 
         # Improve the spine mask
-        mask = morphology.dilation(mask, np.ones((5, 5)))
+        mask = morphology.dilation(mask, np.ones((self._radius, self._radius)))
         mask = ndimage.morphology.binary_fill_holes(mask)
         mask = morphology.dilation(mask, np.ones((3, 3)))
 
