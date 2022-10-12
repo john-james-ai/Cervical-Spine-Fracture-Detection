@@ -11,7 +11,7 @@ title:
 author: John James
 copyright: "2022"
 logo: "images/logo.png"
-root: 00_preface
+root: index
 options:
   numbered: true
 only_build_toc_files: true
