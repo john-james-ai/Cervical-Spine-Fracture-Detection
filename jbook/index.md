@@ -12,9 +12,5 @@ kernelspec:
   language: python
   name: python3
 ---
-# Preface
+# Introduction
 
-Check out the content pages bundled with this sample book to see more.
-
-```{tableofcontents}
-```
