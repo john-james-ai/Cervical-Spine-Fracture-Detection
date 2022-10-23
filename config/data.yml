@@ -4,15 +4,38 @@
 # Project    : Cervical Spine Fracture Detection                                                   #
 # Version    : 0.1.0                                                                               #
 # Python     : 3.10.4                                                                              #
-# Filename   : /__init__.py                                                                        #
+# Filename   : /data.yml                                                                           #
 # ------------------------------------------------------------------------------------------------ #
 # Author     : John James                                                                          #
 # Email      : john.james.ai.studio@gmail.com                                                      #
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
-# Created    : Tuesday September 13th 2022 09:01:23 pm                                             #
-# Modified   : Monday October 17th 2022 07:37:25 am                                                #
+# Created    : Saturday October 15th 2022 07:49:47 am                                              #
+# Modified   : Saturday October 15th 2022 09:39:11 am                                              #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
 # ================================================================================================ #
+---
+# Data Directories
+RAW_SCANS_DIR: data/raw/train_images
+RAW_SEGMENTS_DIR: data/raw/segmentations
+PREPROCESSED_SCANS_DIR: data/processed/train_images
+
+# Model Directory
+LABELING_MODELS_DIR: models/labels
+DETECTION_MODELS_DIR: models/detection
+
+# Submissions
+SAMPLE_SUBMISSION_FILEPATH: data/raw/sample_submission.csv
+SUBMISSIONS_DIR: data/submissions
+
+# Data Filepaths
+TRAIN_TARGETS_FILEPATH: data/raw/train.csv
+TRAIN_CTResults_META_FILEPATH: data/raw/train_CTResults_meta.csv
+TRAIN_IMAGES_META_FILEPATH: data/raw/train_images_meta.csv
+TRAIN_SEGMENTS_META_FILEPATH: data/raw/train_segments_meta.csv
+TRAIN_BOUNDING_BOX_FILEPATH: data/raw/train_bounding_boxes.csv
+TEST_FILEPATH: data/raw/test.csv
+
+

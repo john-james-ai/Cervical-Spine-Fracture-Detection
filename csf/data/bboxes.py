@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday October 4th 2022 03:15:09 am                                                #
-# Modified   : Tuesday October 4th 2022 06:27:28 am                                                #
+# Modified   : Saturday October 15th 2022 09:39:16 am                                              #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -26,7 +26,7 @@ class CSFBoundingBoxes:
     def __init__(self, filepath: str) -> None:
         self._filepath = filepath
         self._bounding_boxes = None
-        self._patients = None
+        self._CTResults = None
         self._summary = None
         self._errors = None
         self._multiple_boxes = None
@@ -36,8 +36,8 @@ class CSFBoundingBoxes:
         return self._bounding_boxes.shape
 
     @property
-    def n_patients(self) -> int:
-        return len(self._patients)
+    def n_CTResults(self) -> int:
+        return len(self._CTResults)
 
     @property
     def n_errors(self) -> pd.DataFrame:
@@ -53,18 +53,18 @@ class CSFBoundingBoxes:
     def get_bounding_boxes(self) -> pd.DataFrame:
         return self._bounding_boxes
 
-    def get_patients(self, n: int = None, random_state: int = None) -> list:
-        """Gets all or n randomly selected patients with bounding boxes
+    def get_CTResults(self, n: int = None, random_state: int = None) -> list:
+        """Gets all or n randomly selected CTResults with bounding boxes
 
         Args:
-            n (int): Number of patients to return. None (default) returns all
+            n (int): Number of CTResults to return. None (default) returns all
         """
         if n:
             rng = np.random.default_rng(random_state)
-            return rng.choice(self._patients, n, replace=False)
+            return rng.choice(self._CTResults, n, replace=False)
 
         else:
-            return self._patients
+            return self._CTResults
 
     def summarize(self) -> pd.DataFrame:
         return self._summary
@@ -75,7 +75,7 @@ class CSFBoundingBoxes:
     def get_multiple_boxes_summary(self) -> pd.DataFrame:
         return self._multiple_boxes.sort_values("count")
 
-    def get_patients_multiple_boxes(self) -> np.array:
+    def get_CTResults_multiple_boxes(self) -> np.array:
         return self._multiple_boxes.index.values
 
     def get_multiple_boxes(self) -> pd.DataFrame:
@@ -85,7 +85,7 @@ class CSFBoundingBoxes:
 
     def load(self) -> None:
         self._bounding_boxes = pd.read_csv(self._filepath)
-        self._patients = set(self._bounding_boxes["StudyInstanceUID"])
+        self._CTResults = set(self._bounding_boxes["StudyInstanceUID"])
         self._summary = self._bounding_boxes.groupby("StudyInstanceUID").agg(
             {"slice_number": ["min", "max", "count"]}
         )

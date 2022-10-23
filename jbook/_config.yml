@@ -4,10 +4,9 @@
 # Learn more at https://jupyterbook.org/customize/config.html
 
 title:
-  <p>
-  Automated Segmentation, Labeling, and Detection of Cervical Spine Fractures<br>
-  Deep Learning for Diagnostic Computed Tomography (CT)
-  </p>
+  Automated, Segmentation, Labeling, and Detection of Cervical Spine Fractures
+  <p><span style="font-size:10px"><span style="color:#e74c3c">Deep Learning</span><span style="color:#001936"> for Diagnostic Computer Tomography</span></span></p>
+
 author: John James
 copyright: "2022"
 logo: "images/logo.png"

@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday September 13th 2022 08:33:33 pm                                             #
-# Modified   : Saturday October 1st 2022 03:38:22 pm                                               #
+# Modified   : Saturday October 15th 2022 09:39:16 am                                              #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -19,8 +19,7 @@
 import pytest
 import pydicom
 import pandas as pd
-from csf.data.studies import CSFStudies
-from csf.data.scans import CSFScan
+from csf.data.patient import CTResults
 
 # ------------------------------------------------------------------------------------------------ #
 TRAINING_METADATA_FILEPATH = "data/raw/train.csv"
@@ -36,15 +35,7 @@ def training_metadata():
 
 @pytest.fixture(scope="module")
 def csf_test():
-    return CSFStudies(TRAINING_METADATA_FILEPATH)
-
-
-@pytest.fixture(scope="module")
-def scan():
-    studies = CSFStudies(filepath=TRAINING_METADATA_FILEPATH)
-    study = studies.get_sample_study_by_fracture_count(n=2)
-    scan = CSFScan(study=study)
-    return scan
+    return CTResults(TRAINING_METADATA_FILEPATH)
 
 
 @pytest.fixture(scope="module")
