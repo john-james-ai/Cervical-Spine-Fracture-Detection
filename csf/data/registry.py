@@ -4,14 +4,14 @@
 # Project    : Cervical Spine Fracture Detection                                                   #
 # Version    : 0.1.0                                                                               #
 # Python     : 3.10.4                                                                              #
-# Filename   : /wandb.py                                                                           #
+# Filename   : /registry.py                                                                        #
 # ------------------------------------------------------------------------------------------------ #
 # Author     : John James                                                                          #
 # Email      : john.james.ai.studio@gmail.com                                                      #
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Monday September 5th 2022 04:51:01 pm                                               #
-# Modified   : Tuesday October 25th 2022 08:11:08 am                                               #
+# Modified   : Tuesday October 25th 2022 11:53:37 am                                               #
 # ------------------------------------------------------------------------------------------------ #
 # License    : BSD 3-Clause "New" or "Revised" License                                             #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -25,9 +25,11 @@ import wandb
 
 # ------------------------------------------------------------------------------------------------ #
 
+def FileRegistry
+
 
 @dataclass
-class Artifact:
+class Fileset:
     """General Artifact class
 
     Args:
