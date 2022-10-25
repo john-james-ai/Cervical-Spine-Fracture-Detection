@@ -4,62 +4,45 @@
 # Project    : Cervical Spine Fracture Detection                                                   #
 # Version    : 0.1.0                                                                               #
 # Python     : 3.10.4                                                                              #
-# Filename   : /test_scans.py                                                                      #
+# Filename   : /test_datasets.py                                                                   #
 # ------------------------------------------------------------------------------------------------ #
 # Author     : John James                                                                          #
 # Email      : john.james.ai.studio@gmail.com                                                      #
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
-# Created    : Thursday September 15th 2022 12:37:38 pm                                            #
-# Modified   : Saturday September 17th 2022 04:01:35 am                                            #
+# Created    : Sunday October 23rd 2022 09:26:01 pm                                                #
+# Modified   : Monday October 24th 2022 01:10:10 am                                                #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
 # ================================================================================================ #
 import inspect
+import pandas as pd
+import tensorflow as tf
 import pytest
 import logging
 import logging.config
-from csf.data import Study
+
+from csf.data.dataset import RSNALabelDatasetBuilder
+from csf import SEGMENTATION_METADATA_FILEPATH
 
 # ------------------------------------------------------------------------------------------------ #
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 # ------------------------------------------------------------------------------------------------ #
 
 
-@pytest.mark.scan
-class TestScan:
-    def test_scan_properties(self, caplog, scan):
+@pytest.mark.dataset
+class TestDatasetBuilder:
+    def test_dataset_builder(self, caplog):
         logger.info("\tStarted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
 
-        assert isinstance(scan.study, Study)
-        assert isinstance(scan.basedir, str)
-
-        logger.info("\tCompleted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
-
-    def test_load_slices(self, caplog, scan):
-        logger.info("\tStarted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
-
-        assert isinstance(scan.img_shape, list)
-        # assert isinstance(scan.patient_name, tuple(None, str))
-        # assert isinstance(scan.patient_id, tuple(None, str))
-        # assert isinstance(scan.modality, tuple(None, str))
-        # assert isinstance(scan.study_date, tuple(None, str))
-
-        logger.info("\tCompleted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
-
-    def test_print_slice(self, caplog, scan):
-        logger.info("\tStarted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
-
-        scan.print_slice()
-        assert True
-
-        logger.info("\tCompleted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
-
-    def test_slice_viewer(self, caplog, scan):
-        logger.info("\tStarted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
-
-        assert True
+        seg_meta = pd.read_csv(SEGMENTATION_METADATA_FILEPATH, index_col=None)
+        builder = RSNALabelDatasetBuilder(metadata=seg_meta, seed=22, eager=True)
+        builder.build()
+        print(builder.spec)
+        ds = builder.dataset
+        assert isinstance(ds, tf.data.Dataset)
+        print(ds.element_spec)
 
         logger.info("\tCompleted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))

@@ -12,7 +12,10 @@
         ["url", "https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection"],
         ["projectname", "Cervical Spine Fracture Detection"],
         ["version", "0.1.0"],
-        ["pythonversion","3.10.4"]
-        ]
+        ["pythonversion","3.10.6"]
+        ],
+        "psi-header.config": {
+
+        }
     }
 }

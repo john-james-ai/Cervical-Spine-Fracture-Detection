@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Sunday October 16th 2022 09:54:27 pm                                                #
-# Modified   : Saturday October 22nd 2022 10:02:49 am                                              #
+# Modified   : Sunday October 23rd 2022 09:21:07 pm                                                #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -27,7 +27,7 @@ import nibabel as nib
 from csf.data.base import BaseMETA
 from csf import (
     SEGMENTATION_FILEPATHS,
-    TRAIN_SEGMENTATION_METADATA_FILEPATH,
+    SEGMENTATION_METADATA_FILEPATH,
     TRAIN_SLICE_METADATA_FILEPATH,
     N_JOBS,
 )
@@ -48,7 +48,7 @@ class VertebraeLabelExtractor(BaseMETA):
         self,
         train_metadata_filepath: str = TRAIN_SLICE_METADATA_FILEPATH,
         segmentation_filepath_glob_pattern: str = SEGMENTATION_FILEPATHS,
-        output_filepath: str = TRAIN_SEGMENTATION_METADATA_FILEPATH,
+        output_filepath: str = SEGMENTATION_METADATA_FILEPATH,
         force: str = False,
     ) -> None:
 
