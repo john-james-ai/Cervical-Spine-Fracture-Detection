@@ -11,12 +11,13 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Saturday October 15th 2022 10:55:08 am                                              #
-# Modified   : Saturday October 22nd 2022 07:08:58 am                                              #
+# Modified   : Tuesday October 25th 2022 08:12:10 am                                               #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
 # ================================================================================================ #
 """Vertebrae Segmentation and Labeling"""
+from abc import ABC, abstractmethod
 import os
 import pandas as pd
 from glob import glob
@@ -26,27 +27,56 @@ from pydicom import dcmread
 from joblib import Parallel, delayed
 
 from csf.data.base import BaseMETA
-from csf import (
-    TRAIN_IMAGES_DIR,
-    TRAIN_IMAGES_FILEPATHS,
-    TRAIN_SLICE_METADATA_FILEPATH,
-    TRAIN_SCAN_METADATA_FILEPATH,
-    N_JOBS,
-)
+from csf.config.data import FileConfig
+from csf.config import train_images_file_config, train_metadata_file_config
 
+# ------------------------------------------------------------------------------------------------ #
+class MetadataFactory(ABC):
+    """Base class for Metadata Extractor Classes"""
+
+    def __init__(self, input_file: FileConfig, output_file: FileConfig, force: bool = False) -> None:
+        self._input_file_config = input_file
+        self._output_file_config = output_file
+        self._force = force
+        self._metadata = None
+
+    def run(self) -> None:
+        if self._force or not os.path.exists(self._output_file_config.full_path):
+            self._run()
+
+    @abstractmethod
+    def _run(self) -> None:
+        pass
+
+    @abstractmethod
+    def _load(self) -> None:
+        """Loads the the file containing the metadata"""
+        pass
+
+    @abstractmethod
+    def _extract_metadata(self) -> dict:
+        """Extracts and returns a dictionary containing the metadata."""
+        pass
+    
+    def _save(self) -> None:
+        path = self._output_file_config.full_path
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        self._metadata.to_csv(path, header=True, index=False)
+
+    def _log(self) -> None:
 # ------------------------------------------------------------------------------------------------ #
 
 
 class SliceMETA(BaseMETA):
     """Encapsulates all DICOM SLICE metadata for exploratory purposes.
 
-    filepaths (str): Path glob for all DICOM files.
+    input_file_config (FileConfig): Training image file configuration.
     """
 
     def __init__(
         self,
-        input_file_glob_pattern: str = TRAIN_IMAGES_FILEPATHS,
-        output_filepath: str = TRAIN_SLICE_METADATA_FILEPATH,
+        input_file_config: FileConfig = train_images_file_config,
+        output_file_config: FileConfig = train_metadata_file_config,
         force: bool = False,
     ) -> None:
         super().__init__(
@@ -123,66 +153,3 @@ class SliceMETA(BaseMETA):
             slice_metadata["WindowCenter"] = center
 
         return slice_metadata
-
-
-# ------------------------------------------------------------------------------------------------ #
-
-
-class ScanMETA(BaseMETA):
-    """Aggregates and encapsulates the Scan level metadata from the slice level metadata.
-
-    Args:
-        filepath (str): Path to the Slice level metadata
-    """
-
-    def __init__(
-        self,
-        input_filepath: str = TRAIN_SLICE_METADATA_FILEPATH,
-        output_filepath: str = TRAIN_SCAN_METADATA_FILEPATH,
-        force: bool = False,
-    ) -> None:
-        super().__init__(
-            input_filepath=input_filepath, output_filepath=output_filepath, force=force
-        )
-
-    @property
-    def info(self) -> None:
-        pass
-
-    @property
-    def shape(self) -> None:
-        pass
-
-    def load(self, force: bool = False) -> None:
-        """Loads Scan level metadata.
-
-        Load from existing file if it exists and Force is False, otherwise, create from Slice Metadata.
-
-        Args:
-            force (bool): If True, compute from Slice metadata, even if the Scan metadata exists.
-        """
-        if self._force or not self._exists(self._output_filepath):
-
-            slice_metadata = pd.read_csv(
-                self._input_filepath,
-                usecols=[
-                    "StudyInstanceUID",
-                    "PatientID",
-                    "SliceThickness",
-                    "PixelSpacing_X",
-                    "PixelSpacing_Y",
-                    "RescaleIntercept",
-                    "RescaleSlope",
-                    "WindowWidth",
-                    "WindowCenter",
-                ],
-                index_col=False,
-            )
-
-            slice_metadata["Slices"] = slice_metadata.StudyInstanceUID.map(
-                slice_metadata.StudyInstanceUID.value_counts()
-            )
-            self._df = slice_metadata.groupby("StudyInstanceUID").first().reset_index()
-
-        else:
-            self._df = pd.read_csv(self._output_filepath)
