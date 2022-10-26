@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday September 13th 2022 06:23:18 pm                                             #
-# Modified   : Monday October 17th 2022 12:21:08 pm                                                #
+# Modified   : Tuesday October 25th 2022 01:35:30 pm                                               #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -28,6 +28,7 @@ from csf import FIG_SIZE
 # ------------------------------------------------------------------------------------------------ #
 
 
+@pytest.mark.skiptest
 class CTResults:
     """Collection of patient outcomes and the C1,C7 and Overall fracture targets.
 
@@ -50,9 +51,8 @@ class CTResults:
     __subaxial_region = ["C3", "C4", "C5", "C6", "C7"]
     __vertebrae = ["C1", "C2", "C3", "C4", "C5", "C6", "C7"]
 
-    def __init__(self, filepath: str) -> None:
-        self._filepath = filepath
-        self._df = self.load(filepath)
+    def __init__(self, df: str) -> None:
+        self._df = df
         self._df["total"] = self._df[CTResults.__vertebrae].sum(axis=1)
 
     @property
@@ -130,19 +130,6 @@ class CTResults:
     def n_patients_by_fracture_count(self) -> pd.DataFrame:
         df = self._df[CTResults.__vertebrae].copy()
         return df.sum(axis=0).to_frame().rename(columns={0: "Number of CTResults"})
-
-    def load(self, filepath: str = None) -> pd.DataFrame:
-        """Reads patient data from the designated file."""
-        filepath = filepath or self._filepath
-        df = pd.read_csv(filepath, index_col=None)
-        if "subaxial" not in df.columns:
-            df["subaxial"] = df[CTResults.__subaxial_region].sum(axis=1)
-            df["craniovertebral"] = df[CTResults.__craniovertebral_region].sum(axis=1)
-        return df
-
-    def save(self, filepath: str) -> None:
-        """Writes patient data to file."""
-        self._df.to_csv(filepath)
 
     def sample(self, n: int = 5) -> pd.DataFrame:
         rng = default_rng()

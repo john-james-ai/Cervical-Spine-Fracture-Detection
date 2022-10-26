@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday October 25th 2022 08:40:24 am                                               #
-# Modified   : Tuesday October 25th 2022 12:06:02 pm                                               #
+# Modified   : Tuesday October 25th 2022 01:07:48 pm                                               #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -132,10 +132,6 @@ class Event(ABC):
     @property
     def duration(self) -> str:
         return self._duration
-
-    @property
-    def return_code(self) -> datetime:
-        return self._return_code
 
     def generate_artifact(self) -> dict:
         return {k: v for k, v in self.__dict__.items() if v not in [None, ""]}

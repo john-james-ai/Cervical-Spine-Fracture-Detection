@@ -11,22 +11,21 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday October 25th 2022 08:38:51 am                                               #
-# Modified   : Tuesday October 25th 2022 02:11:47 pm                                               #
+# Modified   : Tuesday October 25th 2022 07:57:39 pm                                               #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
 # ================================================================================================ #
 import os
-from abc import ABC, abstractmethod
 from datetime import datetime
 from csf.base.entity import Entity
 from csf.base.config import Config
-from csf.base.io import IO
+from csf.base.repo import Repo, RepoBuilder
 
 
 # ------------------------------------------------------------------------------------------------ #
-class Repo(ABC):
-    """Base class for Domain Repository objects, such as Data,Analyses, Configs, and Experiments.
+class FileRepo(Repo):
+    """FileRepo class encapsulating persistence for Filesets
 
     Args:
         name (str): Human readible name for the registry
@@ -34,76 +33,27 @@ class Repo(ABC):
         type (str): One of ['data','analysis','experiment','inference']
     """
 
-    def __init__(self) -> None:
-        self._name = None
-        self._type = None
-        self._description = None
-        self._entity = os.get_env("WANDB_ENTITY")
-        self._created = datetime.now()
-        self._n_items = 0
-        self._registry_filepath = None
-        self._io = None
 
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @name.setter
-    def name(self, name: str) -> None:
-        self._name = name
-
-    @property
-    def type(self) -> str:
-        return self._type
-
-    @type.setter
-    def type(self, type: str) -> None:
-        self._type = type
-
-    @property
-    def description(self) -> str:
-        return self._description
-
-    @description.setter
-    def description(self, description: str) -> None:
-        self._updated = datetime.now()
-        self._description = description
-
-    @property
-    def io(self) -> IO:
-        return self._io
-
-    @io.setter
-    def io(self, io: IO) -> None:
-        self._io = io
-
-    @property
-    def created(self) -> datetime:
-        return self._created
-
-    @abstractmethod
-    def get(self, name: str) -> Entity:
+    def load(self, name) -> Fileset:
         pass
 
-    @abstractmethod
     def getall(self) -> [Entity]:
         pass
 
-    @abstractmethod
     def add(self, entity: Entity) -> None:
         pass
 
-    @abstractmethod
     def update(self, entity: Entity) -> None:
         pass
 
-    @abstractmethod
     def delete(self, entity: Entity) -> None:
         pass
 
+    def registry_lookup(self, name: str) ->
+
 
 # ------------------------------------------------------------------------------------------------ #
-class RepoBuilder(ABC):
+class FileRepoBuilder(RepoBuilder):
     """Abstract builder for object repositories.
 
     Args:
@@ -113,13 +63,12 @@ class RepoBuilder(ABC):
 
     def __init__(self, config: Config) -> None:
         self._config = config
-        self._repo = None
-        self._force = False
+        self._repo = self.reset()
 
     @property
     @abstractmethod
-    def repo(self) -> Repo:
-        pass
+    def reset(self) -> FileRepo:
+        return FileRepo()
 
     @abstractmethod
     def build_access(self) -> None:
@@ -127,7 +76,7 @@ class RepoBuilder(ABC):
 
     @abstractmethod
     def build_storage(self) -> None:
-        pass
+        self._config.uri
 
     @abstractmethod
     def build_io(self) -> None:
