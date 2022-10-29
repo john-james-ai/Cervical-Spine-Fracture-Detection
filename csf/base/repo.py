@@ -10,129 +10,56 @@
 # Email      : john.james.ai.studio@gmail.com                                                      #
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
-# Created    : Tuesday October 25th 2022 08:38:51 am                                               #
-# Modified   : Tuesday October 25th 2022 02:11:47 pm                                               #
+# Created    : Thursday October 27th 2022 08:58:37 pm                                              #
+# Modified   : Friday October 28th 2022 08:09:36 pm                                                #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
 # ================================================================================================ #
+"""Package Repositories."""
 import os
+import pandas as pd
 from abc import ABC, abstractmethod
-from datetime import datetime
-from csf.base.entity import Entity
-from csf.base.config import Config
-from csf.base.io import IO
-
+from typing import Any
 
 # ------------------------------------------------------------------------------------------------ #
 class Repo(ABC):
-    """Base class for Domain Repository objects, such as Data,Analyses, Configs, and Experiments.
-
-    Args:
-        name (str): Human readible name for the registry
-        description (str): Brielfy describes the entity and its purpose.
-        type (str): One of ['data','analysis','experiment','inference']
-    """
-
-    def __init__(self) -> None:
-        self._name = None
-        self._type = None
-        self._description = None
-        self._entity = os.get_env("WANDB_ENTITY")
-        self._created = datetime.now()
-        self._n_items = 0
-        self._registry_filepath = None
-        self._io = None
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @name.setter
-    def name(self, name: str) -> None:
-        self._name = name
-
-    @property
-    def type(self) -> str:
-        return self._type
-
-    @type.setter
-    def type(self, type: str) -> None:
-        self._type = type
-
-    @property
-    def description(self) -> str:
-        return self._description
-
-    @description.setter
-    def description(self, description: str) -> None:
-        self._updated = datetime.now()
-        self._description = description
-
-    @property
-    def io(self) -> IO:
-        return self._io
-
-    @io.setter
-    def io(self, io: IO) -> None:
-        self._io = io
-
-    @property
-    def created(self) -> datetime:
-        return self._created
+    def __init__(self, basedir: str) -> None:
+        self._basedir = basedir
 
     @abstractmethod
-    def get(self, name: str) -> Entity:
+    def create(self, name: str, **kwargs) -> None:
         pass
 
     @abstractmethod
-    def getall(self) -> [Entity]:
+    def read(self, name: str) -> Any:
         pass
 
     @abstractmethod
-    def add(self, entity: Entity) -> None:
+    def update(self, name: str, data: Any) -> None:
         pass
 
     @abstractmethod
-    def update(self, entity: Entity) -> None:
+    def delete(self, name: str) -> None:
         pass
 
-    @abstractmethod
-    def delete(self, entity: Entity) -> None:
-        pass
-
+    def _get_path(self, path: str) -> str:
+        return os.path.join(self._basedir, path)
 
 # ------------------------------------------------------------------------------------------------ #
-class RepoBuilder(ABC):
-    """Abstract builder for object repositories.
+class FileRepo(Repo):
 
-    Args:
-        config (Config): Repository builder config
 
-    """
+    __registry = 
 
-    def __init__(self, config: Config) -> None:
-        self._config = config
-        self._repo = None
-        self._force = False
+    def __init__(self, basedir: str) -> None:
+        super().__init__(basedir=basedir)
+        self._load_registry()
 
-    @property
-    @abstractmethod
-    def repo(self) -> Repo:
-        pass
+    def create(self, name: str, path: str, description: str = None) -> None:
+        """Creates a file or directory with the given name, path, and optional description."""
 
-    @abstractmethod
-    def build_access(self) -> None:
-        pass
+    def list_filepath(self, name: str) -> list:
+        """Provides a list of files in the named directory."""
 
-    @abstractmethod
-    def build_storage(self) -> None:
-        pass
 
-    @abstractmethod
-    def build_io(self) -> None:
-        pass
-
-    @abstractmethod
-    def build_registry(self) -> None:
-        pass
