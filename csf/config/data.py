@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Monday October 24th 2022 07:35:27 am                                                #
-# Modified   : Monday October 24th 2022 11:38:34 pm                                                #
+# Modified   : Thursday October 27th 2022 01:53:37 pm                                              #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -32,83 +32,6 @@ from glob import glob
 from typing import Union, Optional
 
 from csf.config.base import Config
-
-# ------------------------------------------------------------------------------------------------ #
-
-
-@dataclass
-class FileConfig(Config):
-    """File Configuration
-
-    Args:
-        root_dir (str): The root directory for the file. This is set based upon the value of 'on_kaggle'
-        kaggle_base_input_folder (str): The read-only Kaggle folder containing all input data
-        kaggle_base_working_folder (str): The Kaggle folder in which working files are stored.
-        local_base_input_folder (str): The local folder containing all input data
-        local_base_working_folder (str): The local folder containing working files.
-        path (str): Path or path specification for a file or file set, not including root_dir
-        full_path (str): Full path or path specification to the file or file set.
-        on_kaggle (bool): True if running in a Kaggle notebook, False otherwise. Default = False
-        input_data (bool): True if the File is part of the provided input data, False otherwise. Default = True
-        path_is_glob (bool): True if the path should be treated as a glob, False otherwise. Default = False
-    """
-
-    KAGGLE_BASE_INPUT_FOLDER: str = "kaggle/input/rsna-2022-cervical-spine-fracture-detection"
-    KAGGLE_BASE_WORKING_FOLDER: str = "kaggle/working/"
-    LOCAL_BASE_INPUT_FOLDER = "data/input/"
-    KAGGLE_BASE_WORKING_FOLDER = "data/working/"
-
-    root_dir: str = ""
-    path: str = ""
-    full_path: str = ""
-    on_kaggle: bool = False
-    input_data: bool = True
-    path_is_glob: bool = False
-
-    def __post_init__(self) -> None:
-        """Sets the root_dir into which the file resides"""
-        if self.on_kaggle and self.input_data:
-            self.root_dir = self.kaggle_base_input_folder
-        elif self.on_kaggle and not self.input_data:
-            self.root_dir = self.kaggle_base_working_folder
-        elif not self.on_kaggle and self.input_data:
-            self.root_dir = self.local_base_input_folder
-        else:
-            self.root_dir = self.local_base_working_folder
-
-        if self.path_is_glob:
-            self.full_path = glob(pathname=self.path, root_dir=self.root_dir)
-        else:
-            self.full_path = os.path.join(self.root_dir, self.path)
-
-
-# ------------------------------------------------------------------------------------------------ #
-@dataclass
-class AugmentationConfig(Config):
-    """Augmentation Configuration for a Dataset
-
-    Args:
-        frac (float): The fraction of the Dataset to augment for each augmentation
-            operation. The data are shuffled prior to each augmentation and a
-            different frac of observations are randomly selected for the augmentation
-            operation. Default = 0.33
-        flip_horizontal (bool): Whether to flip the image horizontally. Default = True.
-        flip_vertical (bool): Whether to flip the image vertically. Default = True.
-        crop (bool): Whether to crop the image. Default = True
-        crop_shape (tuple): The target shape of the cropped image. Default = (128,128)
-        rotate (bool): Whether to randomly rotate images. Default = True
-        rotation_factor (np.float16): The rotation factor to apply. Default = 0.15. Which means
-            that the images will be rotated a random number of degrees in [-0.15,0.15].
-    """
-
-    frac: float = 0.33
-    flip_horizontal: bool = True
-    flip_vertical: bool = True
-    crop: bool = True
-    rotate: bool = True
-    crop_shape: tuple = (128, 128)
-    rotation_factor: float = 0.15
-
 
 # ------------------------------------------------------------------------------------------------ #
 @dataclass
@@ -136,12 +59,10 @@ class DatasetConfig(Config):
         seed (int): Pseudorandom seed for reproducibility.
     """
 
-    input_file_config: FileConfig = ""
     input_image_shape: tuple = (512, 512)
     output_image_shape: tuple = (224, 224, 3)
     n_classes: int = 7  # Or 8 if including patient_overall
     classes: list = []
-    augmentation_config: Optional[AugmentationConfig] = None
     batch_size: int = 32
     batch_drop_remainder: bool = True
     training: bool = True

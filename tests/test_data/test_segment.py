@@ -4,25 +4,27 @@
 # Project    : Cervical Spine Fracture Detection                                                   #
 # Version    : 0.1.0                                                                               #
 # Python     : 3.10.6                                                                              #
-# Filename   : /test_config.py                                                                     #
+# Filename   : /test_segment.py                                                                    #
 # ------------------------------------------------------------------------------------------------ #
 # Author     : John James                                                                          #
 # Email      : john.james.ai.studio@gmail.com                                                      #
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
-# Created    : Tuesday October 25th 2022 01:08:13 pm                                               #
-# Modified   : Tuesday October 25th 2022 07:57:30 pm                                               #
+# Created    : Thursday October 27th 2022 06:43:32 pm                                              #
+# Modified   : Friday October 28th 2022 05:57:18 am                                                #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
 # ================================================================================================ #
+import os
+import pandas as pd
 import inspect
 import pytest
 import logging
 import logging.config
 
-from csf.data.entity import Fileset
-from csf.data.config import FilesetConfig
+# Enter imports for modules and classes being tested here
+from csf.data.segment import RSNASegmentationVertebraeExtractor
 
 # ------------------------------------------------------------------------------------------------ #
 logging.basicConfig(level=logging.DEBUG)
@@ -30,26 +32,45 @@ logger = logging.getLogger(__name__)
 # ------------------------------------------------------------------------------------------------ #
 
 
-@pytest.mark.config
-class TestBuildFileRepo
-    def test_build_file_repo(self, caplog):
+@pytest.mark.vertebrae
+class TestVertebraeExtractor:
+    def test_vertebrae_extractor(self, caplog):
         logger.info("\tStarted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))
 
+        input_path = "data/input/segmentations/*.nii"
+        output_path = "tests/data/preprocess/vertebrae.csv"
+        study_id = "1.2.826.0.1.3680043.12281"
+        slice_number = 116
 
+        ext = RSNASegmentationVertebraeExtractor(
+            input_path=input_path, output_path=output_path, force=False
+        )
+        ext.execute()
 
+        assert os.path.exists(output_path)
 
-        fsc = FilesetConfig(
-            name="test_fileset_config", storage_uri="data/input", event_name="build_metadata_event"
+        df = pd.read_csv(output_path, index_col=False)
+        print(df.head())
+        n_patients = df["StudyInstanceUID"].nunique()
+        n_images = df.shape[0]
+        print(
+            "There are {} patients with {} images for an average of {} per patient.".format(
+                n_patients, n_images, n_images / n_patients
+            )
         )
 
-        assert fsc.name == "test_fileset_config"
-        assert fsc.storage_uri == "data/input"
-        assert fsc.event_name == "build_metadata_event"
+        assert df.shape[0] > 1000
+        assert df.shape[1] == 9
 
-        fsc.description = "FSC Description"
-        config = fsc.as_dict()
+        slice = df.loc[(df["StudyInstanceUID"] == study_id) & (df["SliceNumber"] == slice_number)]
+        print("\n")
+        print(slice)
+        vertebrae = [0, 1, 0, 0, 0, 0, 0]
+        for i in range(1, 8):
+            assert slice[f"C{i}"].values == vertebrae[i - 1]
 
-        assert isinstance(config, dict)
-        assert isinstance(config[""], _{_name__} or tuple)
+        assert isinstance(ext.started, str)
+        assert isinstance(ext.ended, str)
+        assert isinstance(ext.duration, str)
 
         logger.info("\tCompleted {} {}".format(self.__class__.__name__, inspect.stack()[0][3]))

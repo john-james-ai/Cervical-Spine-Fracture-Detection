@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Monday October 24th 2022 10:57:43 am                                                #
-# Modified   : Monday October 24th 2022 02:10:22 pm                                                #
+# Modified   : Thursday October 27th 2022 01:06:00 pm                                              #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -39,9 +39,12 @@ class RuntimeConfig(Config):
     """High-level configurations for Runtime.
 
     Args:
-        distribution_strategy_type: e.g. 'mirrored', 'tpu', etc.
-        distribution_strategy: The distribution strategy object.
-        enable_xla: Whether or not to enable XLA.
+        name: Defaults to 'runtime'.
+        environment: e.g. 'local', 'kaggle'
+        base_dir: The base directory for data for the home
+        strategy_type: e.g. 'mirrored', 'tpu', etc.
+        strategy: The distribution strategy object.
+        device: One of ['cpu','gpu','tpu']
         gpus: List of available GPUs.
         num_gpus: The number of GPUs to use, if any.
         gpu_thread_mode: Whether and how the GPU device uses its own threadpool.
@@ -65,8 +68,10 @@ class RuntimeConfig(Config):
             persistent mode for CuDNN batch norm kernel for improved GPU performance.
     """
 
-    distribution_strategy_type: str = "mirrored"
-    distribution_strategy: tf.distribution.Strategy = None
+    name: str = "runtime"
+    environment: str = "local"
+    strategy_type: str = "mirrored"
+    strategy: tf.distribute = None
     device: str = ""
     enable_xla: bool = False
     gpus: list = None
@@ -110,19 +115,19 @@ class RuntimeConfig(Config):
             )  # connect to tpu cluster
             self.strategy = tf.distribute.TPUStrategy(self.tpu)  # get strategy for tpu
             self.strategy_type = "tpu"
-            self.device = "TPU"
+            self.device = "tpu"
 
-        except tf.python.framework.errors.NotFoundError:  # otherwise detect GPUs
+        except:  # noqa(E722)
             self.gpus = tf.config.list_logical_devices("GPU")  # get logical gpus
             self.num_gpus = len(self.gpus)
-            if self.n_gpus > 0:
+            if self.num_gpus > 0:
                 self.strategy = tf.distribute.MirroredStrategy(self.gpus)  # single-GPU or multi-GPU
                 self.strategy_type = "mirrored"
-                self.device = "GPU"
+                self.device = "gpu"
             else:
                 self.strategy = tf.distribute.get_strategy()  # connect to single gpu or cpu
                 self.strategy_type = "default"
-                self.device = "CPU"
+                self.device = "cpu"
 
     def model_parallelism(self):
         return dict(
