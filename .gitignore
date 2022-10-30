@@ -27,6 +27,11 @@ MANIFEST
 
 # Data
 /data/
+tests/data/
+
+# Image Files
+*.nii
+*.documentation
 
 # Lab
 *lab.*
