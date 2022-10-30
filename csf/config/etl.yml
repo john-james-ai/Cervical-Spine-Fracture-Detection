@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+# ================================================================================================ #
+# Project    : Cervical Spine Fracture Detection                                                   #
+# Version    : 0.1.0                                                                               #
+# Python     : 3.10.6                                                                              #
+# Filename   : /etl.yml                                                                            #
+# ------------------------------------------------------------------------------------------------ #
+# Author     : John James                                                                          #
+# Email      : john.james.ai.studio@gmail.com                                                      #
+# URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
+# ------------------------------------------------------------------------------------------------ #
+# Created    : Friday October 28th 2022 10:46:48 pm                                                #
+# Modified   : Saturday October 29th 2022 09:07:06 am                                              #
+# ------------------------------------------------------------------------------------------------ #
+# License    : MIT License                                                                         #
+# Copyright  : (c) 2022 John James                                                                 #
+# ================================================================================================ #
+dag_no: 1
+dag_name: rsna_csfd_etl
+dag_description: RSNA 3033 Cervical Spine Fracture Detection ETL
+operations:
+# ------------------------------------------------------------------------------------------------ #
+#                                      DOWNLOAD DATA                                               #
+# ------------------------------------------------------------------------------------------------ #
+    1:
+        operation_no: 1
+        operation_name: download_rsna_csfd
+        operator: KaggleDownloader
+        module: csf.data.etl
+        operation_description: Download RSNA 2022 Cervical Spine Fracture Detection Dataset
+        operation_params:
+            competition: rsna-2022-cervical-spine-fracture-detection
+            filename: rsna-2022-cervical-spine-fracture-detection.zip
+            destination: downloads
+            force: False
+# ------------------------------------------------------------------------------------------------ #
+#                                  EXTRACT VERTEBRAE                                               #
+# ------------------------------------------------------------------------------------------------ #
+    2:
+        operation_no: 2
+        operation_name: extract_vertebrae
+        operator: SegmentationVertebraeExtractor
+        module: csf.data.etl
+        operation_description: Extracts Annotated Vertebrae Data
+        operation_params:
+            source: input/segmentations
+            target: stage/segmentation_metadata.csv
+            n_jobs: 12
+            verbose: 10
+            force: False
+
+# ------------------------------------------------------------------------------------------------ #
+#                           CREATE SEGMENTATION TRAIN DATA                                         #
+# ------------------------------------------------------------------------------------------------ #
+    3:
+        operation_no: 3
+        operation_name: create_segmentation_train_data
+        operator: SegmentationTrainDataGenerator
+        module: csf.data.etl
+        operation_description: Create Segmentation Training Data
+        operation_params:
+            source: stage/segmentation_metadata.csv
+            target: stage/segmentation_train/
+            force: False
+
+# ------------------------------------------------------------------------------------------------ #
+#                              EXTRACT DICOM TRAIN METADATA                                        #
+# ------------------------------------------------------------------------------------------------ #
+    4:
+        operation_no: 4
+        operation_name: extract_dicom_train_meta_data
+        operator: DicomMetadataExtractor
+        module: csf.data.etl
+        operation_description: Extract DICOM Train Image Metadata
+        operation_params:
+            source_images: input/train_images/
+            source_metadata: input/train.csv
+            target: stage/fracture_train_metadata.csv
+            force: False
+
+# ------------------------------------------------------------------------------------------------ #
+#                              EXTRACT DICOM TEST METADATA                                         #
+# ------------------------------------------------------------------------------------------------ #
+    5:
+        operation_no: 5
+        operation_name: extract_dicom_test_meta_data
+        operator: DicomMetadataExtractor
+        module: csf.data.etl
+        operation_description: Extract DICOM Test Image Metadata
+        operation_params:
+            source_images: input/test_images/
+            source_metadata: input/test.csv
+            target: stage/fracture_test_metadata.csv
+            force: False
+
+# ------------------------------------------------------------------------------------------------ #
+#                              CREATE FRACTURE TRAIN DATA                                          #
+# ------------------------------------------------------------------------------------------------ #
+    6:
+        operation_no: 6
+        operation_name: create_fracture_train_data
+        operator: FractureTrainDataGenerator
+        module: csf.data.etl
+        operation_description: Fracture Train Data Generator
+        operation_params:
+            source_images: input/train_images/
+            source_metadata: stage/fracture_train_metadata.csv
+            target: stage/fracture_train/
+            force: False
+# ------------------------------------------------------------------------------------------------ #
+#                               COPY BOUNDING BOX DATA                                             #
+# ------------------------------------------------------------------------------------------------ #
+    7:
+        operation_no: 7
+        operation_name: copy_bounding_box_data
+        operator: Copy
+        module: csf.data.file
+        operation_description: Copy File
+        operation_params:
+            source_images: input/train_bounding_boxes.csv
+            target: stage/train_bounding_boxes.csv
+            force: False

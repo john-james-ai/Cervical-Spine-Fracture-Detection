@@ -28,6 +28,9 @@ MANIFEST
 # Data
 /data/
 
+# Lab
+*lab.*
+
 # MLOps
 /mlruns/
 

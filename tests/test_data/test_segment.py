@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Thursday October 27th 2022 06:43:32 pm                                              #
-# Modified   : Friday October 28th 2022 05:57:18 am                                                #
+# Modified   : Saturday October 29th 2022 06:55:24 am                                              #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -24,7 +24,7 @@ import logging
 import logging.config
 
 # Enter imports for modules and classes being tested here
-from csf.data.segment import RSNASegmentationVertebraeExtractor
+from csf.data.etl import SegmentationVertebraeExtractor
 
 # ------------------------------------------------------------------------------------------------ #
 logging.basicConfig(level=logging.DEBUG)
