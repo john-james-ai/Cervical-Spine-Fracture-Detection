@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+# ================================================================================================ #
+# Project    : Cervical Spine Fracture Detection                                                   #
+# Version    : 0.1.0                                                                               #
+# Python     : 3.10.4                                                                              #
+# Filename   : /_toc.yml                                                                           #
+# ------------------------------------------------------------------------------------------------ #
+# Author     : John James                                                                          #
+# Email      : john.james.ai.studio@gmail.com                                                      #
+# URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
+# ------------------------------------------------------------------------------------------------ #
+# Created    : Wednesday October 12th 2022 06:53:58 am                                             #
+# Modified   : Wednesday October 12th 2022 08:58:47 am                                             #
+# ------------------------------------------------------------------------------------------------ #
+# License    : MIT License                                                                         #
+# Copyright  : (c) 2022 John James                                                                 #
+# ================================================================================================ #
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: index
+options:
+  numbered: 3
+chapters:
+- file: 10_intro
+- file: 20_data
+- file: 30_eda
+- file: 40_preprocess
+- file: 50_segmentation
+- file: 60_detection

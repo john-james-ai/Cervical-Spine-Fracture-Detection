@@ -1,0 +1,8 @@
+name,path,description
+train,input/train.csv,"Training data including patient/study identifier, and fracture indicators for each of seven cervical spine vertebrae."
+test,input/test.csv,Test data including the patient/study identifier and the vertebra for which a detection prediction is to be provided.
+train_bounding_boxes,input/train_bounding_boxes. Csv,Bounding box data for the training set.
+segmentations,input/segmentations,Directory containing vertebrae segmentation data for 87 patients/studies.
+train_images,input/train_images,Directory containing subdirectories of training set patient studies comprised of DICOM image files.
+test_images,input/test_images,Directory containing subdirectories of test set patient studies comprised of DICOM image files.
+segmentation_labels,working/segmentation_labels.csv,Segmentation label data specifying the vertebrae appearing in each of the segmented scan images.
