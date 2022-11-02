@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Monday October 24th 2022 09:28:16 pm                                                #
-# Modified   : Tuesday October 25th 2022 08:12:10 am                                               #
+# Modified   : Wednesday November 2nd 2022 05:41:54 am                                             #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -96,8 +96,8 @@ class JobConfig(Config):
         self.project_config = self.run_group_config.project_config
         self.project = self.project_config.name
         self.group = self.run_group_config.name
-        self.dir = os.get_env("WANDB_DIR")
-        self.mode = os.get_env("WANDB_MODE")
+        self.dir = os.getenv("WANDB_DIR")
+        self.mode = os.getenv("WANDB_MODE")
 
 
 # ------------------------------------------------------------------------------------------------ #

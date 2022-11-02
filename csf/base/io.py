@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Saturday October 29th 2022 12:46:06 am                                              #
-# Modified   : Tuesday November 1st 2022 05:18:17 pm                                               #
+# Modified   : Tuesday November 1st 2022 11:35:31 pm                                               #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -140,7 +140,7 @@ class NibabelIO(IO):
         return nib.load(filepath).get_fdata()
 
     @classmethod
-    def _write(cls, filepath: str, data: Any, force: bool = True, **kwargs) -> None:
+    def _write(cls, filepath: str, data: Any, **kwargs) -> None:
         pass
 
 
@@ -155,8 +155,23 @@ class DicomIO(IO):
         return tf.io.read_file(filepath)
 
     @classmethod
-    def _write(cls, filepath: str, data: Any, force: bool = True) -> None:
+    def _write(cls, filepath: str, data: Any, **kwargs) -> None:
         pass
+
+
+# ------------------------------------------------------------------------------------------------ #
+#                                              H5                                                  #
+# ------------------------------------------------------------------------------------------------ #
+
+
+class H5IO(IO):
+    @classmethod
+    def _read(cls, filepath: str, **kwargs) -> tf.keras.Model:
+        return tf.keras.models.load_model(filepath)
+
+    @classmethod
+    def _write(cls, filepath: str, data: tf.keras.Model, **kwargs) -> None:
+        data.save(filepath)
 
 
 # ------------------------------------------------------------------------------------------------ #
@@ -171,7 +186,9 @@ class IOFactory:
         "pkl": PickleIO,
         "pickle": PickleIO,
         "nii": NibabelIO,
+        "nib": NibabelIO,
         "dcm": DicomIO,
+        "h5": H5IO,
     }
 
     @classmethod

@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Thursday October 27th 2022 02:35:17 pm                                              #
-# Modified   : Tuesday November 1st 2022 03:47:16 pm                                               #
+# Modified   : Wednesday November 2nd 2022 05:18:45 am                                             #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -19,11 +19,8 @@
 """Base class for all configuration sub-classes."""
 from datetime import datetime
 from dataclasses import dataclass
+from csf.base import IMMUTABLE_TYPES, SEQUENCE_TYPES
 
-# ------------------------------------------------------------------------------------------------ #
-# Constants
-IMMUTABLE_TYPES: tuple = (str, int, float, bool, type(None))
-SEQUENCE_TYPES: tuple = (list, tuple)
 # ------------------------------------------------------------------------------------------------ #
 
 
