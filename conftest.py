@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday September 13th 2022 08:33:33 pm                                             #
-# Modified   : Wednesday November 2nd 2022 05:04:32 am                                             #
+# Modified   : Wednesday November 2nd 2022 10:36:33 pm                                             #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -24,6 +24,12 @@ import pandas as pd
 
 
 @pytest.fixture
-def table():
+def tables():
     data = pd.read_csv("tests/data/io/test1.csv", index_col=False)
-    return Table(name="test_table", data=data, type="dataset", description="test_table_described")
+    tables = []
+    for i in range(5):
+        name = "test_table_number_" + str(i)
+        desc = "Table for Testing the Registries and Repositories #" + str(i)
+
+        tables.append(Table(name=name, data=data, type="dataset", description=desc))
+    return tables

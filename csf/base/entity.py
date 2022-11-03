@@ -11,7 +11,7 @@
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday November 1st 2022 10:28:59 pm                                               #
-# Modified   : Wednesday November 2nd 2022 05:45:38 am                                             #
+# Modified   : Thursday November 3rd 2022 12:41:11 am                                              #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
@@ -28,7 +28,7 @@ from csf.base import IMMUTABLE_TYPES, SEQUENCE_TYPES
 # ------------------------------------------------------------------------------------------------ #
 
 
-@dataclass(frozen=True)
+@dataclass
 class Entity(ABC):
     """Entity. Base class for File, Model, and all entities that have a lifecycle.
 
@@ -43,7 +43,6 @@ class Entity(ABC):
         description (str):  Optional free text that offers a description of the artifact. The description is
             markdown rendered in the UI, so this is a good place to place tables, links, etc.
         created (datetime): The datetime when the entity was created.
-        modified (datetime): The datetime when the entity was updated.
         path: (str): The relative path to the entity, including base directory. This is assigned by the repo.
     """
 
@@ -54,13 +53,12 @@ class Entity(ABC):
     type: str = None
     description: str = None
     created: datetime = None
-    modified: datetime = None
     path: str = None
+    is_archived: bool = False
 
     def __post_init__(self) -> None:
         self.id = self.name + "-" + wandb.util.generate_id()
         self.created = datetime.now()
-        self.modified = datetime.now()
 
     def as_dict(self) -> dict:
         """Returns a dictionary representation of the the Config object."""
@@ -78,7 +76,10 @@ class Entity(ABC):
         elif isinstance(v, dict):
             return {kk: cls._export_config(vv) for kk, vv in v}
         else:
-            return "Mutable Object"
+            try:
+                return v.__class__.__name__
+            except:  # noqa 722
+                return "Mutable Object"
 
 
 @dataclass
@@ -96,7 +97,6 @@ class Table(Entity):
         description (str):  Optional free text that offers a description of the artifact. The description is
             markdown rendered in the UI, so this is a good place to place tables, links, etc.
         created (datetime): The datetime when the entity was created.
-        modified (datetime): The datetime when the entity was updated.
         path: (str): The relative path to the entity, including base directory. This is assigned by the repo.
         size: (int): The size of the Table in bytes
         rows: (int): The number of rows in the Table
@@ -111,9 +111,10 @@ class Table(Entity):
     def __post_init__(self) -> None:
         self.id = self.name + "-" + wandb.util.generate_id()
         self.created = datetime.now()
-        self.modified = datetime.now()
-        self.obj = wandb.WBValue = wandb.data_types.Table
-        self.size = self.data.memory_usage(index=True, deep=True).sum()
-        self.rows = self.data.shape[0]
-        self.cols = self.data.shape[1]
-        self.nulls = self.data.isna().sum().sum()
+        self.obj = wandb.WBValue = wandb.data_types.Table(
+            columns=self.data.columns, dataframe=self.data, allow_mixed_types=True
+        )
+        self.size = int(self.data.memory_usage(index=True, deep=True).sum())
+        self.rows = int(self.data.shape[0])
+        self.cols = int(self.data.shape[1])
+        self.nulls = int(self.data.isna().sum().sum())
