@@ -4,19 +4,19 @@
 # Project    : Cervical Spine Fracture Detection                                                   #
 # Version    : 0.1.0                                                                               #
 # Python     : 3.10.6                                                                              #
-# Filename   : /entity.py                                                                          #
+# Filename   : /artifact.py                                                                        #
 # ------------------------------------------------------------------------------------------------ #
 # Author     : John James                                                                          #
 # Email      : john.james.ai.studio@gmail.com                                                      #
 # URL        : https://github.com/john-james-ai/Cervical-Spine-Fracture-Detection                  #
 # ------------------------------------------------------------------------------------------------ #
 # Created    : Tuesday November 1st 2022 10:28:59 pm                                               #
-# Modified   : Thursday November 3rd 2022 12:41:11 am                                              #
+# Modified   : Friday November 4th 2022 08:13:00 pm                                                #
 # ------------------------------------------------------------------------------------------------ #
 # License    : MIT License                                                                         #
 # Copyright  : (c) 2022 John James                                                                 #
 # ================================================================================================ #
-"""Module defining the base Entity Type."""
+"""Module defining the base Artifact Type."""
 from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime
@@ -29,21 +29,21 @@ from csf.base import IMMUTABLE_TYPES, SEQUENCE_TYPES
 
 
 @dataclass
-class Entity(ABC):
-    """Entity. Base class for File, Model, and all entities that have a lifecycle.
+class Artifact(ABC):
+    """Artifact. Base class for File, Model, and all entities that have a lifecycle.
 
     Args:
         id (str): The Artifact's id.
         name (str): A human readible name for a fileset that doesnt contain the file extension
-        data (Any): The content of the Entity object.
+        data (Any): The content of the Artifact object.
         obj (Any): The wandb data type
         type (str): The type of the artifact, which is used to organize and differentiate artifacts.
             Common types include dataset or model, but you can use any string containing letters, numbers,
-            underscores, hyphens, and dots. Set by the Entity sub-class.
+            underscores, hyphens, and dots. Set by the Artifact sub-class.
         description (str):  Optional free text that offers a description of the artifact. The description is
             markdown rendered in the UI, so this is a good place to place tables, links, etc.
-        created (datetime): The datetime when the entity was created.
         path: (str): The relative path to the entity, including base directory. This is assigned by the repo.
+        created (datetime): The datetime when the entity was created.
     """
 
     name: str
@@ -52,9 +52,8 @@ class Entity(ABC):
     obj: wandb.data_types = None
     type: str = None
     description: str = None
-    created: datetime = None
     path: str = None
-    is_archived: bool = False
+    created: datetime = None
 
     def __post_init__(self) -> None:
         self.id = self.name + "-" + wandb.util.generate_id()
@@ -83,8 +82,8 @@ class Entity(ABC):
 
 
 @dataclass
-class Table(Entity):
-    """Table Entity.
+class Table(Artifact):
+    """Table Artifact.
 
     Args:
         id (str): The Artifact's id.
@@ -93,7 +92,7 @@ class Table(Entity):
         obj (Any): The wandb data type
         type (str): The type of the artifact, which is used to organize and differentiate artifacts.
             Common types include dataset or model, but you can use any string containing letters, numbers,
-            underscores, hyphens, and dots. Set by the Entity sub-class.
+            underscores, hyphens, and dots. Set by the Artifact sub-class.
         description (str):  Optional free text that offers a description of the artifact. The description is
             markdown rendered in the UI, so this is a good place to place tables, links, etc.
         created (datetime): The datetime when the entity was created.
